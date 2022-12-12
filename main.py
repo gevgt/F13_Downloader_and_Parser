@@ -4,7 +4,8 @@ from xlm_file_to_data_frame import XlmFileToDataFrame
 
 
 def runner(action_index: int):
-    path_to_file_dump = '/Users/gedeonvogt/Desktop/RWTH Aachen/WHF-FiRRM/Projekte/Dokumentendownload/F13_Downloader_and_Parser/Filedump'
+    path_to_file_dump       = '/Users/gedeonvogt/Desktop/RWTH Aachen/WHF-FiRRM/Projekte/Dokumentendownload/F13_Downloader_and_Parser/Filedump'
+    path_to_holdings_dump   = '/Users/gedeonvogt/Desktop/RWTH Aachen/WHF-FiRRM/Projekte/Dokumentendownload/F13_Downloader_and_Parser/Filedump/Holdings Dump'
 
     # Download
     if action_index == 0:
@@ -14,7 +15,7 @@ def runner(action_index: int):
 
     # Parsing
     elif action_index == 1:
-        XlmFileToDataFrame(GetRelevantPaths(path_to_file_dump).get_paths()).main()
+        XlmFileToDataFrame(GetRelevantPaths(path_to_file_dump).get_paths(), path_to_holdings_dump).main()
 
     else:
         raise Exception('Action Index Out Of Bounds. Has to be either 0 or 1.')

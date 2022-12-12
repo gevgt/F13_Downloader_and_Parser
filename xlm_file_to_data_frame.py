@@ -5,8 +5,9 @@ from f13_download import FileDownload as fd
 
 class XlmFileToDataFrame:
 
-    def __init__(self, dict_with_cik_and_path: dict):
+    def __init__(self, dict_with_cik_and_path: dict, path_to_holdings_dump: str):
         self.dict_with_cik_and_path = dict_with_cik_and_path
+        self.path_to_holdings_dump  = path_to_holdings_dump
 
     @staticmethod
     def __bring_xlm_file_in_correct_format(text: str) -> str:
@@ -34,7 +35,7 @@ class XlmFileToDataFrame:
 
     def __save_cik_holding_dfs(self, data_frame: pd.DataFrame, cik: str) -> None:
         path        = self.dict_with_cik_and_path[cik][list(self.dict_with_cik_and_path[cik])[0]][0]
-        saving_path = f'{path[:path.find(cik) + len(cik)]}/{cik}_holdings.json'
+        saving_path = f'{self.path_to_holdings_dump}/{cik}_holdings.json'
         data_frame.to_json(saving_path)
 
     @staticmethod

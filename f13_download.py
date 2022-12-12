@@ -8,6 +8,7 @@ class FileDownload:
         self.dl             = Downloader(path_to_file_dump)
         self.filing_types   = filing_types
         self.start_date     = start_date
+        self.cik_lookup     = self.get_cik_lookup()
 
     def download(self):
         ciks        = self.get_list('ciks.txt')
@@ -46,3 +47,28 @@ class FileDownload:
     def print_loading_percentage(cik: str, ciks: list[str], done_ciks: list[str]) -> None:
         len_done_ciks = len(done_ciks) - 1 if '' in done_ciks else len(done_ciks)
         print(f'{cik} - {int((len_done_ciks/len(ciks))*100)}%')
+
+    @staticmethod
+    def get_cik_lookup():
+        with open('cik-lookup-data.txt', encoding = "ISO-8859-1") as f:
+            lines = f.readlines()
+
+        lines = [line[:-2] for line in lines]
+
+        splitted_lines = []
+        for line in lines:
+            splitted_line = line.split(":")
+            if len(splitted_line) == 2:
+                splitted_lines.append(reversed(splitted_line))
+            else:
+                for i, letter in enumerate(line):
+                    if not line[-(i + 1)].isnumeric():
+                        break
+                splitted_lines.append([line[:len(line)-(i+1)], line[-i:]])
+
+        return dict(splitted_lines)
+
+    def save_ciks_to_txt(self):
+        lines = list(self.cik_lookup.keys())
+        with open('ciks.txt', 'w') as f:
+            f.writelines('\n'.join(lines))
