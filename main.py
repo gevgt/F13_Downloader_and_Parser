@@ -1,6 +1,7 @@
 from f13_download import FileDownload
 from get_relevant_paths import GetRelevantPaths
 from xlm_file_to_data_frame import XlmFileToDataFrame
+from final_product import FinalProduct
 
 
 def runner(action_index: int):
@@ -17,8 +18,13 @@ def runner(action_index: int):
     elif action_index == 1:
         XlmFileToDataFrame(GetRelevantPaths(path_to_file_dump).get_paths(), path_to_holdings_dump).main()
 
+    # Final Product
+    elif action_index == 2:
+        FinalProduct(path_to_holdings_dump).run()
+
+
     else:
-        raise Exception('Action Index Out Of Bounds. Has to be either 0 or 1.')
+        raise Exception('Action Index Out Of Bounds. Has to be either 0, 1 or 2.')
 
 
 if __name__ == '__main__':

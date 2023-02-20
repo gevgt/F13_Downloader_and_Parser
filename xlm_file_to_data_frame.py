@@ -18,25 +18,34 @@ class XlmFileToDataFrame:
         for path in self.dict_with_cik_and_path[cik][filing_type]:
             with open(path) as f:
                 text = f.read()
-            text = self.__bring_xlm_file_in_correct_format(text)
+            table_part_of_text = self.__bring_xlm_file_in_correct_format(text)
             try:
-                df = pd.read_xml(text)
+                df = pd.read_xml(table_part_of_text)
             except:
                 continue
             try:
                 date = self.__extract_date_from_path(path)
+
+                zip_plus_20_str = text[text.find('ZIP:') + 4:text.find('ZIP:') + 20]
+                zip = zip_plus_20_str[:zip_plus_20_str.find('\n')].replace('\t', '')
+
+                reporting_date_plus_40_str = text[text.find('FILED AS OF DATE:')+17 : text.find('FILED AS OF DATE:') + 40]
+                reporting_date = reporting_date_plus_40_str[:reporting_date_plus_40_str.find('\n')].replace('\t', '')
             except:
+                print()
                 with open('loading_errors.txt') as f:
                     ciks = f.read()
                 error_ciks = set(ciks.split('\n'))
                 if '' in error_ciks:
                     error_ciks.remove('')
-                fd.write_list(error_ciks + [cik], 'parsing_error_to_df.txt')
+                fd.write_list(list(error_ciks) + [cik], 'parsing_error_to_df.txt')
                 return None
             df = pd.concat([
                 df[['cusip', 'value']],
                 pd.DataFrame([date] * len(df), columns=['fdate']),
-                pd.DataFrame([filing_type] * len(df), columns=['filetype'])
+                pd.DataFrame([reporting_date] * len(df), columns=['Reporting Date']),
+                pd.DataFrame([filing_type] * len(df), columns=['filetype']),
+                pd.DataFrame([zip] * len(df), columns=['ZIP Code'])
             ], axis=1)
 
             results_df.append(df)
