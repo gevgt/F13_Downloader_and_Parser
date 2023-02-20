@@ -1,5 +1,6 @@
 from sec_edgar_downloader import Downloader
 import time
+import pandas as pd
 
 
 class FileDownload:
@@ -68,7 +69,14 @@ class FileDownload:
 
         return dict(splitted_lines)
 
-    def save_ciks_to_txt(self):
-        lines = list(self.cik_lookup.keys())
+    @staticmethod
+    def save_ciks_to_txt():
+        with open('/Users/gedeonvogt/Desktop/RWTH Aachen/WHF-FiRRM/Projekte/Dokumentendownload/F13_Downloader_and_Parser/master', encoding="ISO-8859-1") as f:
+            lines = f.readlines()
+
+        col_names = ['cik', 'company name', 'filing', 'date', 'link']
+        subset_lines = pd.DataFrame([line.split("|") for line in lines], columns=col_names)
+        sl = subset_lines.loc[subset_lines['filing'].isin(['13F-HR', '13F-NT', '13FCONP'])]['cik']
+        lines = list(sl)
         with open('ciks.txt', 'w') as f:
             f.writelines('\n'.join(lines))

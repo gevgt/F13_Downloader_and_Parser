@@ -23,7 +23,16 @@ class XlmFileToDataFrame:
                 df = pd.read_xml(text)
             except:
                 continue
-            date = self.__extract_date_from_path(path)
+            try:
+                date = self.__extract_date_from_path(path)
+            except:
+                with open('loading_errors.txt') as f:
+                    ciks = f.read()
+                error_ciks = set(ciks.split('\n'))
+                if '' in error_ciks:
+                    error_ciks.remove('')
+                fd.write_list(error_ciks + [cik], 'parsing_error_to_df.txt')
+                return None
             df = pd.concat([
                 df[['cusip', 'value']],
                 pd.DataFrame([date] * len(df), columns=['fdate']),
@@ -35,8 +44,8 @@ class XlmFileToDataFrame:
 
     def __save_cik_holding_dfs(self, data_frame: pd.DataFrame, cik: str) -> None:
         path        = self.dict_with_cik_and_path[cik][list(self.dict_with_cik_and_path[cik])[0]][0]
-        saving_path = f'{self.path_to_holdings_dump}/{cik}_holdings.json'
-        data_frame.to_json(saving_path)
+        saving_path = f'{self.path_to_holdings_dump}/{cik}_holdings.csv'
+        data_frame.to_csv(saving_path)
 
     @staticmethod
     def __extract_date_from_path(path: str) -> str:
@@ -49,7 +58,7 @@ class XlmFileToDataFrame:
         month, day, year    = text_with_date[start:end].split('-')
 
         day     = day if len(day) == 2 else f'0{day}'
-        moth    = month if len(month) == 2 else f'0{month}'
+        month   = month if len(month) == 2 else f'0{month}'
         year    = year if len(year) == 4 else f'00{year}'
 
         return f'{year}{month}{day}'
