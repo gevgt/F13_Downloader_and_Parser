@@ -29,10 +29,13 @@ class XlmFileToDataFrame:
                 zip_plus_20_str = text[text.find('ZIP:') + 4:text.find('ZIP:') + 20]
                 zip = zip_plus_20_str[:zip_plus_20_str.find('\n')].replace('\t', '')
 
-                reporting_date_plus_40_str = text[text.find('FILED AS OF DATE:')+17 : text.find('FILED AS OF DATE:') + 40]
-                reporting_date = reporting_date_plus_40_str[:reporting_date_plus_40_str.find('\n')].replace('\t', '')
+                filed_as_of_date_plus_40_str = text[text.find('FILED AS OF DATE:')+17 : text.find('FILED AS OF DATE:') + 40]
+                filed_as_of_date = filed_as_of_date_plus_40_str[:filed_as_of_date_plus_40_str.find('\n')].replace('\t', '')
+
+                conformed_period_of_report_plus_40_str = text[text.find('CONFORMED PERIOD OF REPORT:') + 27: text.find('CONFORMED PERIOD OF REPORT:') + 40]
+                conformed_period_of_report = conformed_period_of_report_plus_40_str[:conformed_period_of_report_plus_40_str.find('\n')].replace('\t', '')
             except:
-                print()
+                print(f'ERROR ERROR ERROR: {cik}')
                 with open('loading_errors.txt') as f:
                     ciks = f.read()
                 error_ciks = set(ciks.split('\n'))
@@ -43,7 +46,8 @@ class XlmFileToDataFrame:
             df = pd.concat([
                 df[['cusip', 'value']],
                 pd.DataFrame([date] * len(df), columns=['fdate']),
-                pd.DataFrame([reporting_date] * len(df), columns=['Reporting Date']),
+                pd.DataFrame([filed_as_of_date] * len(df), columns=['Filed as of Date']),
+                pd.DataFrame([conformed_period_of_report] * len(df), columns=['Conformed Period of Report']),
                 pd.DataFrame([filing_type] * len(df), columns=['filetype']),
                 pd.DataFrame([zip] * len(df), columns=['ZIP Code'])
             ], axis=1)
